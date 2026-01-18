@@ -1,0 +1,9 @@
+apache-beam[gcp]==2.62.0
+google-cloud-firestore==2.23.0
+pandas==2.3.3
+soundfile==0.13.1
+tensorflow==2.18.0
+crcmod==1.7
+torch==2.6.0
+torchaudio==2.6.0
+transformers==4.45.0
