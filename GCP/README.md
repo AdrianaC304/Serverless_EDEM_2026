@@ -4,8 +4,8 @@
 EDEM 2026
 
 - Professors: 
-    [Javi Briones](https://github.com/jabrio)
-    [Adriana Campos](https://github.com/AdrianaC304)
+    - [Javi Briones](https://github.com/jabrio)
+    - [Adriana Campos](https://github.com/AdrianaC304)
 
 #### Case description
 <img src="https://www.logo.wine/a/logo/Spotify/Spotify-Icon-Logo.wine.svg" alt="WFM" width="170" h/>
@@ -67,7 +67,7 @@ gcloud services enable secretmanager.googleapis.com
 conda activate <ENVIRONTMENT_NAME>
 ```
 
-Alternatively, you can use venv, ensuring that your Python version is 3.12.3
+*Alternatively, you can use venv, ensuring that your Python version is **3.12***
 
 - Create Python environment (Windows - Using CMD terminal)
 ```
