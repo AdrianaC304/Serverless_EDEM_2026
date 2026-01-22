@@ -1,6 +1,7 @@
 """
 Spotify Podcast Data Generator
 Generates synthetic podcast streaming data and publishes to Pub/Sub topics.
+
 EDEM. Master Big Data & Cloud 2025/2026
 Professor: Javi Briones & Adriana Campos
 """
