@@ -40,7 +40,7 @@ def main(db, firestore_collection):
 
     users_ref = db.collection(firestore_collection)
 
-    for i in range(0, 50):
+    for i in range(0, 20):
         user = f"user_{random.randint(1, 9999):04d}"
 
         payload = {
@@ -54,8 +54,11 @@ def main(db, firestore_collection):
             'last_login': firestore.SERVER_TIMESTAMP
         }
 
-        users_ref.add(payload, document_id=user)
-        logging.info(f"Created user document: {user}")
+        try:
+            users_ref.add(payload, document_id=user)
+            logging.info(f"Created user document: {user}")
+        except Exception as e:
+            logging.error(f"Error creating user document {user}: {e}")
 
 if __name__ == "__main__":
 
