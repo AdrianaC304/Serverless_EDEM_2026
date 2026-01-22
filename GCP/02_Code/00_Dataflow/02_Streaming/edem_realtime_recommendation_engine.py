@@ -5,7 +5,7 @@ Script: Dataflow Streaming Pipeline
 Description:
 
 EDEM. Master Big Data & Cloud 2025/2026
-Professor: Javi Briones
+Professor: Javi Briones & Adriana Campos
 """
 
 """ Import Libraries """

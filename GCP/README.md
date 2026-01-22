@@ -99,7 +99,8 @@ Now, go to the [Google Cloud Storage](https://console.cloud.google.com/storage) 
 - A command to upload the necessary audio and image files to the corresponding storage locations for the practice:
 
 ```
-gsutil -m cp -r ./02_Code/00_Dataflow/00_DocAux gs://<YOUR_BUCKET_NAME>/
+cd ./02_Code/00_Dataflow/00_DocAux
+gsutil cp -r * gs://<YOUR_BUCKET_NAME>/
 ```
 
 - Set the required file metadata
@@ -111,16 +112,18 @@ gsutil setmeta \
   -h "x-goog-meta-show_id:The Diary Of A CEO" \
   -h "x-goog-meta-status:processed" \
   -h "x-goog-meta-episode_id:ep_2020" \
-  gs://edem-serverless-spotify-demo/audio/podcast_audio.wav
+  -h "x-goog-meta-duration_sec:6739" \
+  gs://<YOUR_BUCKET_NAME>/audio/podcast_audio.wav
 ```
 
 ```
 gsutil setmeta \
-  -h "x-goog-meta-title:Thierry Henry: I Was Depressed, Crying & Dealing With Trauma!" \
+  -h "x-goog-meta-title:Thierry Henry: I Was Depressed, Crying & Dealing With Trauma." \
   -h "x-goog-meta-duration:1:54:12" \
   -h "x-goog-meta-show_id:The Diary Of A CEO" \
   -h "x-goog-meta-status:processed" \
   -h "x-goog-meta-episode_id:ep_2021" \
+  -h "x-goog-meta-duration_sec:7491" \
   gs://<YOUR_BUCKET_NAME>/audio/podcast_audio_02.wav
 ```
 
