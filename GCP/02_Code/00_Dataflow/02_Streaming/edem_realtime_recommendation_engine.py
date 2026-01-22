@@ -240,22 +240,22 @@ def run():
                 help='GCP cloud project name.')
     
     parser.add_argument(
-                '--playback_pubsub_topic',
+                '--playback_pubsub_subscription_path',
                 required=True,
-                help='Pub/Sub topic for playback events.')
+                help='Pub/Sub subscription for playback events.')
     
     parser.add_argument(
-                '--engagement_pubsub_topic',
+                '--engagement_pubsub_subscription_path',
                 required=True,
-                help='Pub/Sub topic for engagement events.')
+                help='Pub/Sub subscription for engagement events.')
     
     parser.add_argument(
-                '--quality_pubsub_topic',
+                '--quality_pubsub_subscription_path',
                 required=True,
-                help='Pub/Sub topic for quality events.')
+                help='Pub/Sub subscription for quality events.')
 
     parser.add_argument(
-                '--notifications_pubsub_topic',
+                '--notifications_pubsub_topic_path',
                 required=True,
                 help='Pub/Sub topic for push notifications.')
     
@@ -290,21 +290,21 @@ def run():
 
         playback_event = (
             p 
-                | "ReadFromPubSub" >> #ToDo
+                | "ReadFromPlayBackPubSub" >> #ToDo
                 | "ParsePlaybackMessages" >> #ToDo
                 | "NormalizePlaybackEvents" >> #ToDo
         )
 
         engagement_event = (
             p
-                | "ReadFromPubSub" >> #ToDo
+                | "ReadFromEngagementPubSub" >> #ToDo
                 | "ParseEngagementMessages" >> #ToDo
                 | "NormalizeEngagementEvents" >> #ToDo
         )
 
         quality_event = (
             p
-                | "ReadFromPubSub" >> #ToDo
+                | "ReadFromQualityPubSub" >> #ToDo
                 | "ParseQualityMessages" >> #ToDo
                 | "NormalizeQualityEvents" >> #ToDo
         )
@@ -321,12 +321,13 @@ def run():
         )
 
         (
-            user_data.UserMetricsFn.METRICS
+            user_data.metrics
                 | "WriteUserMetricsToBigQuery" >> #ToDo
         )
 
         (
-            user_data.UserMetricsFn.NOTIFY
+            user_data.notify
+                | "EncodeUserNotifications" >> #ToDo
                 | "WriteUserNotificationsToPubSub" >> #ToDo
         )
 
