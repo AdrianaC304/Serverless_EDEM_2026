@@ -1,0 +1,17 @@
+gcloud functions deploy transcribeAudio \
+  --gen2 \
+  --runtime=nodejs20 \
+  --region=us-central1 \
+  --trigger-http \
+  --entry-point=transcribeAudio
+
+
+curl -X POST https://europe-west1-serverless-477916.cloudfunctions.net/transcribeAudio
+
+
+
+gcloud services enable speech.googleapis.com --project=702247964271
+
+
+TOKEN=$(gcloud auth print-identity-token)
+curl -H "Authorization: Bearer $TOKEN" -X POST https://us-central1-serverless-477916.cloudfunctions.net/transcribeAudio

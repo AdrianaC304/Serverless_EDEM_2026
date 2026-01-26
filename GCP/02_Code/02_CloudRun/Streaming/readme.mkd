@@ -1,0 +1,40 @@
+
+gcloud builds submit \
+  --tag europe-west1-docker.pkg.dev/serverless-477916/spotifyartifact/audio-transcriber:latest .
+
+
+gcloud run deploy audio-transcriber \
+  --image europe-west1-docker.pkg.dev/serverless-477916/spotifyartifact/audio-transcriber:latest \
+  --platform managed \
+  --region europe-west1 \
+  --allow-unauthenticated
+
+
+gcloud run deploy audio-transcriber \
+  --image europe-west1-docker.pkg.dev/serverless-477916/spotifyartifact/audio-transcriber:latest \
+  --memory 4Gi \
+  --region europe-west1 \
+  --platform managed \
+  --allow-unauthenticated
+
+
+No funciona:
+
+curl -X POST https://audio-transcriber-702247964271.europe-west1.run.app
+
+
+
+ # Permiso Firestore
+gcloud projects add-iam-policy-binding serverless-477916 \
+  --member="serviceAccount:702247964271-compute@developer.gserviceaccount.com" \
+  --role="roles/datastore.user"
+
+# Permiso Storage (lectura del bucket)
+gcloud projects add-iam-policy-binding serverless-477916 \
+  --member="serviceAccount:702247964271-compute@developer.gserviceaccount.com" \
+  --role="roles/storage.objectViewer"
+
+
+Si funciona:
+curl -H "Authorization: Bearer $(gcloud auth print-identity-token)" \
+  https://audio-transcriber-702247964271.europe-west1.run.app/transcribeAudio

@@ -1,0 +1,7 @@
+torch
+transformers
+soundfile
+numpy
+flask
+google-cloud-storage
+google-cloud-firestore
