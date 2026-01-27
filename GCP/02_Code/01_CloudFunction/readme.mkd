@@ -1,17 +1,17 @@
-gcloud functions deploy transcribeAudio \
-  --gen2 \
-  --runtime=nodejs20 \
-  --region=us-central1 \
-  --trigger-http \
-  --entry-point=transcribeAudio
 
 
-curl -X POST https://europe-west1-serverless-477916.cloudfunctions.net/transcribeAudio
+gcloud functions deploy transcribe_audio2 \
+    --gen2 \
+    --runtime python311 \
+    --trigger-event-filters="type=google.cloud.storage.object.v1.finalized,bucket=edem-serverless-spotify-demo1" \
+    --entry-point=transcribe_audio \
+    --region=europe-west1
 
 
 
-gcloud services enable speech.googleapis.com --project=702247964271
 
-
-TOKEN=$(gcloud auth print-identity-token)
-curl -H "Authorization: Bearer $TOKEN" -X POST https://us-central1-serverless-477916.cloudfunctions.net/transcribeAudio
+gcloud functions add-iam-policy-binding transcribe_audio \
+    --gen2 \
+    --region=europe-west1 \
+    --member="serviceAccount:702247964271-compute@developer.gserviceaccount.com" \
+    --role="roles/run.invoker"
