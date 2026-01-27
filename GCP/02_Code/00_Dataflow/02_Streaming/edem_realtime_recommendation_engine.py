@@ -17,23 +17,11 @@ from apache_beam.transforms.window import Sessions, SlidingWindows
 from apache_beam.io.filesystems import FileSystems
 from apache_beam.utils.timestamp import Timestamp
 
-# B. Apache Beam ML Libraries
-from apache_beam.ml.inference.huggingface_inference import HuggingFacePipelineModelHandler
-from apache_beam.ml.inference.huggingface_inference import PipelineTask
-from apache_beam.ml.inference.base import PredictionResult
-from apache_beam.ml.inference.base import RunInference
-
-# C. Google Cloud Libraries
-from google.cloud import firestore
-
-# D. Python Libraries
-import soundfile as sf
-import numpy as np
+# B. Python Libraries
 import argparse
 import logging
 import uuid
 import json
-import io
 
 """ Code: Helpful functions """
 
@@ -226,6 +214,23 @@ class ContentMetricsFn(beam.DoFn):
                 }
             )
 
+class FormatFirestoreDocument(beam.DoFn):
+
+    def __init__(self,firestore_collection, project_id):
+        self.firestore_collection = firestore_collection
+        self.project_id = project_id
+
+    def setup(self):
+        from google.cloud import firestore
+        self.db = firestore.Client(project=self.project_id)
+
+    def process(self, element):
+
+        #ToDo
+
+        logging.info(f"Document written to Firestore: {doc_ref.id}")
+
+
 """ Code: Dataflow Process """
 
 def run():
@@ -323,6 +328,11 @@ def run():
         (
             user_data.metrics
                 | "WriteUserMetricsToBigQuery" >> #ToDo
+        )
+
+        (
+            user_data.notify
+                | "WriteToFirestore" >> #ToDo
         )
 
         (
