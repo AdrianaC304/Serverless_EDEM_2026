@@ -245,22 +245,22 @@ def run():
                 help='GCP cloud project name.')
     
     parser.add_argument(
-                '--playback_pubsub_subscription_path',
+                '--playback_pubsub_subscription_name',
                 required=True,
                 help='Pub/Sub subscription for playback events.')
     
     parser.add_argument(
-                '--engagement_pubsub_subscription_path',
+                '--engagement_pubsub_subscription_name',
                 required=True,
                 help='Pub/Sub subscription for engagement events.')
     
     parser.add_argument(
-                '--quality_pubsub_subscription_path',
+                '--quality_pubsub_subscription_name',
                 required=True,
                 help='Pub/Sub subscription for quality events.')
 
     parser.add_argument(
-                '--notifications_pubsub_topic_path',
+                '--notifications_pubsub_topic_name',
                 required=True,
                 help='Pub/Sub topic for push notifications.')
     
