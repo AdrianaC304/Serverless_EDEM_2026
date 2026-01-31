@@ -254,9 +254,9 @@ python edem_data_generator.py \
 ```
 python edem_realtime_recommendation_engine.py \
     --project_id <PROJECT_ID> \
-    --playback_pubsub_topic <YOUR_PLAYBACK_PUBSUB_TOPIC_NAME> \
-    --engagement_pubsub_topic <YOUR_ENGAGEMENT_PUBSUB_TOPIC_NAME> \
-    --quality_pubsub_topic <YOUR_QUALITY_PUBSUB_TOPIC_NAME> \
+    --playback_pubsub_topic <YOUR_PLAYBACK_PUBSUB_SUBSCRIPTION_NAME> \
+    --engagement_pubsub_topic <YOUR_ENGAGEMENT_PUBSUB_SUBSCRIPTION_NAME> \
+    --quality_pubsub_topic <YOUR_QUALITY_PUBSUB_SUBSCRIPTION_NAME> \
     --notifications_pubsub_topic <YOUR_NOTIFICATION_PUBSUB_TOPIC_NAME> \
     --firestore_collection <YOUR_FIRESTORE_COLLECTION> \
     --bigquery_dataset <YOUR_BIGQUERY_DATASET> \
@@ -304,7 +304,7 @@ gcloud dataflow flex-template build gs://<YOUR_BASE_BUCKET_NAME>/<YOUR_TEMPLATE_
 ```
 gcloud dataflow flex-template run "<YOUR_DATAFLOW_JOB_NAME>" \
  --template-file-gcs-location="gs://<YOUR_BUCKET_NAME>/<YOUR_TEMPLATE_NAME>.json" \
- --parameters project_id "<PROJECT_ID>", playback_pubsub_topic="<YOUR_PLAYBACK_PUBSUB_TOPIC_NAME>", engagement_pubsub_topic="<YOUR_ENGAGEMENT_PUBSUB_TOPIC_NAME>", quality_pubsub_topic="<YOUR_QUALITY_PUBSUB_TOPIC_NAME>", notifications_pubsub_topic="<YOUR_NOTIFICATION_PUBSUB_TOPIC_NAME>", firestore_collection="<YOUR_FIRESTORE_COLLECTION>", bigquery_dataset="<YOUR_BIGQUERY_DATASET>", user_bigquery_table="<YOUR_USER_BIGQUERY_TABLE>", episode_bigquery_table="<YOUR_EPISODE_BIGQUERY_TABLE>" \
+ --parameters project_id="<PROJECT_ID>",playback_pubsub_subscription_name="<YOUR_PLAYBACK_PUBSUB_SUBSCRIPTION_NAME>",engagement_pubsub_subscription_name="<YOUR_ENGAGEMENT_PUBSUB_SUBSCRIPTION_NAME>",quality_pubsub_subscription_name="<YOUR_QUALITY_PUBSUB_SUBSCRIPTION_NAME>",notifications_pubsub_topic_name="<YOUR_NOTIFICATION_PUBSUB_TOPIC_NAME>",firestore_collection="<YOUR_FIRESTORE_COLLECTION>",bigquery_dataset="<YOUR_BIGQUERY_DATASET>",user_bigquery_table="<YOUR_USER_BIGQUERY_TABLE>",episode_bigquery_table="<YOUR_EPISODE_BIGQUERY_TABLE>" \
  --region=<YOUR_REGION_ID> \
  --max-workers=1
 ```

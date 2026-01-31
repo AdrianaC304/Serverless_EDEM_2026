@@ -1,9 +1,15 @@
-
 """ 
 Script: Dataflow Streaming Pipeline
 
 Description:
-
+This script implements a Dataflow streaming pipeline using Apache Beam to process real-time podcast user interaction events. The pipeline performs the following steps:
+1. Ingests playback, engagement, and quality events from Pub/Sub subscriptions.
+2. Normalizes and merges the events into a unified format.
+3. Computes real-time user metrics using session-based windows.
+4. Computes real-time content metrics using sliding windows.
+5. Stores user and content metrics in BigQuery.
+6. Generates notifications based on user behavior and content trends, storing them in Firestore and publishing them to Pub/Sub.
+ 
 EDEM. Master Big Data & Cloud 2025/2026
 Professor: Javi Briones & Adriana Campos
 """
@@ -245,22 +251,22 @@ def run():
                 help='GCP cloud project name.')
     
     parser.add_argument(
-                '--playback_pubsub_subscription_path',
+                '--playback_pubsub_subscription_name',
                 required=True,
                 help='Pub/Sub subscription for playback events.')
     
     parser.add_argument(
-                '--engagement_pubsub_subscription_path',
+                '--engagement_pubsub_subscription_name',
                 required=True,
                 help='Pub/Sub subscription for engagement events.')
     
     parser.add_argument(
-                '--quality_pubsub_subscription_path',
+                '--quality_pubsub_subscription_name',
                 required=True,
                 help='Pub/Sub subscription for quality events.')
 
     parser.add_argument(
-                '--notifications_pubsub_topic_path',
+                '--notifications_pubsub_topic_name',
                 required=True,
                 help='Pub/Sub topic for push notifications.')
     
@@ -287,8 +293,10 @@ def run():
     args, pipeline_opts = parser.parse_known_args()
 
     # Pipeline Options
-    options = PipelineOptions(pipeline_opts,
-        save_main_session=True, streaming=True, project=args.project_id)
+    options = PipelineOptions(pipeline_opts, streaming=True, project=args.project_id)
+    
+    setup = options.view_as(SetupOptions)
+    setup.save_main_session = True
     
     # Pipeline Object
     with beam.Pipeline(argv=pipeline_opts,options=options) as p:
@@ -349,9 +357,12 @@ def run():
                 | "KeyByEpisodeId" >> #ToDo
                 | "GroupByEpisodeId" >> #ToDo
                 | "ComputeContentMetrics" >> #ToDo
+        )
+          
+        (content_data.metrics 
                 | "WriteToBigQuery" >> #ToDo
         )
-
+        
 if __name__ == '__main__':
 
     # Set Logs
