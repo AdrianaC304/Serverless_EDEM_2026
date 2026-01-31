@@ -2,14 +2,17 @@ import io
 import numpy as np
 import struct
 import soundfile as sf
-from google.cloud import speech, storage
+from google.cloud import speech, storage, firestore
 
 # -----------------------------
 BUCKET_NAME = "edem-serverless-spotify-demo1"
+FIRESTORE_COLLECTION = "transcripciones"
+
 speech_client = speech.SpeechClient()
 storage_client = storage.Client()  # Cliente para leer desde GCS
+firestore_client = firestore.Client()  # Cliente para escribir en Firestore
 
-def transcribe_audio(event, context):
+def transcribe(event, context):
     """
     Cloud Function 2nd Gen que se dispara al subir un archivo a GCS.
     """
@@ -22,17 +25,19 @@ def transcribe_audio(event, context):
     blob = bucket.blob(file_name)
     audio_data = blob.download_as_bytes()
 
+    # -----------------------------
+    # 2️⃣ Leer WAV con soundfile
     audio_array, sr = sf.read(io.BytesIO(audio_data))
     print(f"Audio leído: {audio_array.shape} muestras, Frecuencia de muestreo: {sr} Hz")
 
     # -----------------------------
-    # 2️⃣ Convertir a mono si es estéreo
+    # 3️⃣ Convertir a mono si es estéreo
     if audio_array.ndim > 1:
         audio_array = np.mean(audio_array, axis=1)
         print(f"Convertido a mono: {audio_array.shape} muestras")
 
     # -----------------------------
-    # 3️⃣ Convertir a PCM16
+    # 4️⃣ Convertir a PCM16
     pcm16 = b''.join(
         struct.pack('<h', int(np.clip(x * 32767, -32768, 32767)))
         for x in audio_array
@@ -40,7 +45,7 @@ def transcribe_audio(event, context):
     print(f"Audio convertido a PCM16: {len(pcm16)} bytes")
 
     # -----------------------------
-    # 4️⃣ Configurar Speech-to-Text
+    # 5️⃣ Configurar Speech-to-Text
     audio = speech.RecognitionAudio(content=pcm16)
     config = speech.RecognitionConfig(
         encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
@@ -50,12 +55,10 @@ def transcribe_audio(event, context):
     )
 
     # -----------------------------
-    # 5️⃣ Transcribir
+    # 6️⃣ Transcribir
     response = speech_client.recognize(config=config, audio=audio)
     print("Transcripción recibida ✅")
 
-    # -----------------------------
-    # 6️⃣ Extraer y mostrar texto
     texto = " ".join(
         alt.transcript
         for result in response.results
@@ -65,3 +68,30 @@ def transcribe_audio(event, context):
     print("\n--- Transcripción ---")
     print(texto)
     print("---------------------")
+
+    # -----------------------------
+    # 7️⃣ Refrescar metadatos del blob para asegurar que se lean los personalizados
+    blob.reload() # <--- IMPORTANTE: Esto descarga la info de metadatos actual de GCS
+    
+    metadata = blob.metadata if blob.metadata else {}
+    print(f"Metadatos detectados: {metadata}")
+
+    # -----------------------------
+    # 8️⃣ Guardar en Firestore
+    doc_ref = firestore_client.collection(FIRESTORE_COLLECTION).document(file_name)
+    
+    # Extraemos usando .get() para evitar errores si falta alguna clave
+    data_to_store = {
+        "archivo": file_name,
+        "transcripcion": texto,
+        "title": metadata.get("title"),
+        "show_id": metadata.get("show_id"),
+        "episode_id": metadata.get("episode_id"),
+        "duration": metadata.get("duration"),
+        "status": metadata.get("status"),
+        "language": blob.content_language  # Por si quieres el idioma que pusiste arriba
+    }
+    
+    doc_ref.set(data_to_store)
+
+    print(f"Transcripción y metadatos guardados en Firestore en la colección '{FIRESTORE_COLLECTION}'")

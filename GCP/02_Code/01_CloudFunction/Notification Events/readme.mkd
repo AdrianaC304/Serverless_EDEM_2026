@@ -1,0 +1,17 @@
+gcloud pubsub topics list
+
+
+gcloud functions deploy getEpisodeLanguage \
+  --gen2 \
+  --runtime nodejs20 \
+  --trigger-topic podcastNotificaction \
+  --region us-central1 \
+  --entry-point getEpisodeLanguage
+
+
+
+
+gcloud functions add-iam-policy-binding getEpisodeLanguage \
+    --region us-central1 \
+    --member="serviceAccount:702247964271-compute@developer.gserviceaccount.com" \
+    --role="roles/run.invoker"

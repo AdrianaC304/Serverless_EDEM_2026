@@ -1,0 +1,14 @@
+gcloud functions deploy transcribe \
+    --gen2 \
+    --runtime python311 \
+    --trigger-event google.cloud.storage.object.v1.finalized \
+    --trigger-resource edem-serverless-spotify-demo1 \
+    --region europe-west1 \
+    --memory 512MB \
+    --entry-point transcribe
+
+
+gcloud functions add-iam-policy-binding transcribe \
+    --region europe-west1 \
+    --member="serviceAccount:702247964271-compute@developer.gserviceaccount.com" \
+    --role="roles/run.invoker"

@@ -73,6 +73,8 @@ def transcribe(event, context):
     # 7️⃣ Leer metadatos del blob
     metadata = blob.metadata or {}  # si no hay metadata, devuelve dict vacío
 
+    print("Metadatos del blob:", blob.metadata)
+
     # -----------------------------
     # 8️⃣ Guardar en Firestore
     doc_ref = firestore_client.collection(FIRESTORE_COLLECTION).document(file_name)
