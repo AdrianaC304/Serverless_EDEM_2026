@@ -25,17 +25,19 @@ def transcribe(event, context):
     blob = bucket.blob(file_name)
     audio_data = blob.download_as_bytes()
 
+    # -----------------------------
+    # 2️⃣ Leer WAV con soundfile
     audio_array, sr = sf.read(io.BytesIO(audio_data))
     print(f"Audio leído: {audio_array.shape} muestras, Frecuencia de muestreo: {sr} Hz")
 
     # -----------------------------
-    # 2️⃣ Convertir a mono si es estéreo
+    # 3️⃣ Convertir a mono si es estéreo
     if audio_array.ndim > 1:
         audio_array = np.mean(audio_array, axis=1)
         print(f"Convertido a mono: {audio_array.shape} muestras")
 
     # -----------------------------
-    # 3️⃣ Convertir a PCM16
+    # 4️⃣ Convertir a PCM16
     pcm16 = b''.join(
         struct.pack('<h', int(np.clip(x * 32767, -32768, 32767)))
         for x in audio_array
@@ -43,7 +45,7 @@ def transcribe(event, context):
     print(f"Audio convertido a PCM16: {len(pcm16)} bytes")
 
     # -----------------------------
-    # 4️⃣ Configurar Speech-to-Text
+    # 5️⃣ Configurar Speech-to-Text
     audio = speech.RecognitionAudio(content=pcm16)
     config = speech.RecognitionConfig(
         encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
@@ -53,12 +55,10 @@ def transcribe(event, context):
     )
 
     # -----------------------------
-    # 5️⃣ Transcribir
+    # 6️⃣ Transcribir
     response = speech_client.recognize(config=config, audio=audio)
     print("Transcripción recibida ✅")
 
-    # -----------------------------
-    # 6️⃣ Extraer texto
     texto = " ".join(
         alt.transcript
         for result in response.results
@@ -70,10 +70,20 @@ def transcribe(event, context):
     print("---------------------")
 
     # -----------------------------
-    # 7️⃣ Guardar en Firestore
+    # 7️⃣ Leer metadatos del blob
+    metadata = blob.metadata or {}  # si no hay metadata, devuelve dict vacío
+
+    # -----------------------------
+    # 8️⃣ Guardar en Firestore
     doc_ref = firestore_client.collection(FIRESTORE_COLLECTION).document(file_name)
     doc_ref.set({
         "archivo": file_name,
-        "transcripcion": texto
+        "transcripcion": texto,
+        "title": metadata.get("title"),
+        "show_id": metadata.get("show_id"),
+        "episode_id": metadata.get("episode_id"),
+        "duration": metadata.get("duration"),
+        "status": metadata.get("status")
     })
-    print(f"Transcripción guardada en Firestore en la colección '{FIRESTORE_COLLECTION}'")
+
+    print(f"Transcripción y metadatos guardados en Firestore en la colección '{FIRESTORE_COLLECTION}'")
