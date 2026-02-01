@@ -177,9 +177,9 @@ gcloud run deploy <SERVICE_NAME> \
   --allow-unauthenticated
 ```
 
-## Requisitos de permisos para la cuenta de servicio
+## Service Account Permission Requirements
 
-La cuenta de servicio utilizada para el despliegue debe tener los siguientes permisos:
+The service account used for deployment must have the following permissions:
 
 - **Storage:** `roles/storage.objectAdmin`
 - **Cloud Build:** `roles/cloudbuild.builds.editor`

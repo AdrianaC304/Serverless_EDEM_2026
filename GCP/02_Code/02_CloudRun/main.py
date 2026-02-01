@@ -1,3 +1,20 @@
+""" 
+Script: App & BI
+
+Description:
+
+This code allows us to read data from BigQuery to create a Streamlit dashboard showing:  
+- The total number of episodes in the database  
+- The total number of users in the database  
+- Each episode associated with each user
+
+
+EDEM. Master Big Data & Cloud 2025/2026
+Professor: Javi Briones & Adriana Campos
+"""
+
+""" Import Libraries """
+
 import streamlit as st
 from google.cloud import bigquery
 import pandas as pd
@@ -19,6 +36,9 @@ query_users = """
 SELECT COUNT(DISTINCT user_id) AS total_users
 FROM `serverless-477916.serverless.playback`
 """
+
+# ToDo - Each episode associated with each user
+
 
 # Ejecutar queries
 episodes_df = client.query(query_episodes).to_dataframe()

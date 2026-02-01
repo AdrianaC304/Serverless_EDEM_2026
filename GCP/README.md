@@ -332,6 +332,94 @@ gcloud dataflow flex-template run "<YOUR_DATAFLOW_JOB_NAME>" \
 
 - Once the trigger is created, each new push to the specified branch will trigger the actions specified in the build file, following the steps we set.
 
+
+## Cloud Functions
+
+#### Notification Events
+
+
+```
+gcloud pubsub topics list
+```
+
+```
+gcloud functions deploy getEpisodeLanguage \
+  --gen2 \
+  --runtime nodejs20 \
+  --trigger-topic podcastNotificaction \
+  --region us-central1 \
+  --entry-point getEpisodeLanguage
+```
+
+```
+gcloud functions add-iam-policy-binding getEpisodeLanguage \
+    --region us-central1 \
+    --member="serviceAccount:702247964271-compute@developer.gserviceaccount.com" \
+    --role="roles/run.invoker"
+```
+
+## Cloud Run
+
+Una vez ya hemos visto toda la arquitetcura, en un proyecto real hacer todo este ejericio debería ayudarnos a la toma de decisiones. No que se quede en una proceso sin resolución. Por lo tanto vamos a crear un Dashboard en Streamlite.
+
+As fisrt step tienes que ejecutar este comando desde la consola para crear la imagen en Artfact regsitry, tienes que estar en la carpeta correspondiente:
+
+```
+gcloud builds submit \                                               
+  --tag europe-west1-docker.pkg.dev/serverless-477916/spotifyartifact/playback-dashboard:latest .
+```
+
+A continuación desde la consola despliega el servicio de cloud run para poder ver 
+
+```
+gcloud run deploy playback-dashboard \
+  --image europe-west1-docker.pkg.dev/serverless-477916/spotifyartifact/playback-dashboard:latest \
+  --platform managed \
+  --region europe-west1 \
+  --allow-unauthenticated
+```
+
+Ciertas orgamizaciones no tienen permisos para hacer la url publicas debido a restricciones de la organización. Este comando permite acceder como si el servicio estuviera corriendo localmente sin cambiar permisos ni hacer el servicio público.  Permite probar servicios privados sin exponerlos públicamente.
+
+
+```
+gcloud run services proxy playback-dashboard --region=europe-west1
+```
+
+Abres tu navegador y vas:
+
+http://127.0.0.1:8080/
+
+
+## Cloud Functions
+
+#### Transcribe - Episode collection
+
+Desde un punto de vista de un proyecto real hay veces que la información necesitamos que este en tiempo real, en cuento llega una nueva infromación necesitamos que se ejcute todo el flujo.
+
+Como primer paso vamos a crear una Funcion de segunda generación que nos va a permitir recibir el evento e insertarlo en Firestore.
+
+```
+gcloud functions deploy transcribe \
+    --gen2 \
+    --runtime python311 \
+    --trigger-event google.cloud.storage.object.v1.finalized \
+    --trigger-resource edem-serverless-spotify-demo1 \
+    --region europe-west1 \
+    --memory 512MB \
+    --entry-point transcribe
+```
+
+
+```
+gcloud functions add-iam-policy-binding transcribe \
+    --region europe-west1 \
+    --member="serviceAccount:702247964271-compute@developer.gserviceaccount.com" \
+    --role="roles/run.invoker"
+```
+
+
+
 ## Clean Up
 
 - List your Dataflow pipelines 

@@ -12,7 +12,7 @@ const OUTPUT_TOPIC = 'podcastLanguageResult';
  */
 exports.getEpisodeLanguage = async (message, context) => {
   try {
-    // 1️⃣ Decodifica el mensaje de Pub/Sub
+    // Decode the Pub/Sub message
     const msgStr = Buffer.from(message.data, 'base64').toString();
     const data = JSON.parse(msgStr);
 
@@ -24,7 +24,7 @@ exports.getEpisodeLanguage = async (message, context) => {
 
     console.log(`Buscando lenguaje para episode_id: ${episode_id}`);
 
-    // 2️⃣ Consulta Firestore
+    //Firestore
     const querySnapshot = await firestore
       .collection('transcripciones')
       .where('episode_id', '==', episode_id)
@@ -42,7 +42,7 @@ exports.getEpisodeLanguage = async (message, context) => {
 
     console.log(`Idioma del episodio ${episode_id}: ${language}`);
 
-    // 3️⃣ Publica el idioma en otro topic de Pub/Sub
+    // Publish the language in another Pub/Sub topic.
     const payload = {
       episode_id,
       language

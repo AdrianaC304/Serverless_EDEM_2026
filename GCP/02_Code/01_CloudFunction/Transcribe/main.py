@@ -1,3 +1,16 @@
+""" 
+Script: Event Driven
+
+Description:
+
+This function allows us to **transcribe a .wav audio file into text** and save the resulting information in Firestore.
+
+EDEM. Master Big Data & Cloud 2025/2026
+Professor: Javi Briones & Adriana Campos
+"""
+
+""" Import Libraries """
+
 import io
 import numpy as np
 import struct
@@ -9,8 +22,8 @@ BUCKET_NAME = "edem-serverless-spotify-demo1"
 FIRESTORE_COLLECTION = "transcripciones"
 
 speech_client = speech.SpeechClient()
-storage_client = storage.Client()  # Cliente para leer desde GCS
-firestore_client = firestore.Client()  # Cliente para escribir en Firestore
+storage_client = storage.Client()  
+firestore_client = firestore.Client()  
 
 def transcribe(event, context):
     """
