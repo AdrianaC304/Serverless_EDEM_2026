@@ -219,7 +219,9 @@ Additionally, you need to **modify the function deployment** to set up a **trigg
 
 ## Use case 1:
 
-<img src="00_DocAux/Usecase1.png" width="1500"/>
+<img src="Image/Usecase1.png" width="1500"/>
 
 ## Use case 2:
-<img src="00_DocAux/diagram2.png" width="1500"/>
+
+
+<img src="Image/Usecase2.png" width="1500"/>
