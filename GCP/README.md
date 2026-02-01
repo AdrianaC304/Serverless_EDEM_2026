@@ -340,11 +340,10 @@ gcloud functions deploy getEpisodeLanguage \
   --entry-point getEpisodeLanguage
 ```
 
-
 gcloud functions deploy getEpisodeLanguage \
   --gen2 \
   --runtime nodejs20 \
-  --trigger-topic podcastNotificaction\
+  --trigger-topic podcastNotificaction \
   --region europe-west1 \
   --entry-point getEpisodeLanguage
 
@@ -411,7 +410,7 @@ gcloud functions deploy transcribe \
     --gen2 \
     --runtime python311 \
     --trigger-event google.cloud.storage.object.v1.finalized \
-    --trigger-resource edem-serverless-spotify-demo1 \
+    --trigger-resource edem-serverless-spotify\
     --region europe-west1 \
     --memory 512MB \
     --entry-point transcribe

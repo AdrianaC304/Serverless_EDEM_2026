@@ -2,8 +2,8 @@
 Script: Event Driven
 
 Description:
-This function allows us to transcribe a .wav audio file into text, classify it into a label,
-and store the resulting information in Firestore.
+This function allows us to transcribe a .wav audio file into text and store
+the resulting information in Firestore.
 
 EDEM. Master Big Data & Cloud 2025/2026
 Professor: Javi Briones & Adriana Campos
@@ -19,42 +19,13 @@ from google.cloud import speech, storage, firestore
 
 # -----------------------------
 # Configuration
-BUCKET_NAME = "edem-serverless-spotify"
-FIRESTORE_COLLECTION = "episodes"
+BUCKET_NAME = "edem-serverless-spotify-demo1"
+FIRESTORE_COLLECTION = "transcripciones"
 
 speech_client = speech.SpeechClient()
 storage_client = storage.Client()  
 firestore_client = firestore.Client()  
 
-# -----------------------------
-# Función para mapear texto a label
-def classify_text(text):
-    """
-    Classify transcription text into labels.
-    This is a simple rule-based example. Replace with ML model if needed.
-    """
-    text_lower = text.lower()
-    if any(word in text_lower for word in ["football", "soccer", "basketball", "tennis"]):
-        return "LABEL_1"  # sports
-    elif any(word in text_lower for word in ["economy", "stock", "market", "business"]):
-        return "LABEL_2"  # business
-    elif any(word in text_lower for word in ["science", "technology", "tech", "research"]):
-        return "LABEL_3"  # sci_tech
-    else:
-        return "LABEL_0"  # world
-
-# -----------------------------
-# Función para mapear label técnico a legible
-def map_label(label):
-    LABEL_MAP = {
-        "LABEL_0": "world",
-        "LABEL_1": "sports",
-        "LABEL_2": "business",
-        "LABEL_3": "sci_tech",
-    }
-    return LABEL_MAP.get(label, label)
-
-# -----------------------------
 def transcribe(event, context):
     """
     2nd Gen Cloud Function triggered when a file is uploaded to GCS.
@@ -113,23 +84,19 @@ def transcribe(event, context):
     print("---------------------")
 
     # -----------------------------
-    # Clasificar la transcripción
-    label_key = classify_text(text)
-    label = map_label(label_key)
-    print(f"Assigned label: {label}")
-
-    # -----------------------------
     # Reload blob metadata to ensure custom metadata is available
     blob.reload()
+    
     metadata = blob.metadata if blob.metadata else {}
     print(f"Detected metadata: {metadata}")
 
     # -----------------------------
-    # Store transcription, metadata, and label in Firestore
+    # Store transcription and metadata in Firestore
     doc_ref = firestore_client.collection(FIRESTORE_COLLECTION).document(file_name)
+    
     data_to_store = {
+        "archivo": file_name,
         "transcripcion": text,
-        "label": label,  
         "title": metadata.get("title"),
         "show_id": metadata.get("show_id"),
         "episode_id": metadata.get("episode_id"),
@@ -140,6 +107,6 @@ def transcribe(event, context):
     doc_ref.set(data_to_store)
 
     print(
-        f"Transcription, label, and metadata successfully stored in Firestore "
+        f"Transcription and metadata successfully stored in Firestore "
         f"in the '{FIRESTORE_COLLECTION}' collection"
     )
