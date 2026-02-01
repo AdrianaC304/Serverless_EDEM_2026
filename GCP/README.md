@@ -314,59 +314,82 @@ gcloud dataflow flex-template run "<YOUR_DATAFLOW_JOB_NAME>" \
 
 #### Notification Events
 
-Anteriormente hemos dejado en un topic  
 
-Comprobamos que tenemos el topic creado y elegimos el correcto:
+Previously, you published a message with user information to a Pub/Sub topic. Now, we are going to retrieve that message and display it.
+
+```
+cd ./GCP/02_Code/01_CloudFunction/NotificationEvents
+```
+
+First, we check that the topic exists and make sure we are using the correct one:
 
 ```
 gcloud pubsub topics list
 ```
 
+Next, we will deploy the function. This function allows us to take the episode identifier from the topic and return the default language for that user.
+
+In this case, the trigger name is the same as the topic name. Every time a message arrives, the function will output to the console the default language of that Spotify user. And we are going to insert to 
+
 ```
 gcloud functions deploy getEpisodeLanguage \
   --gen2 \
   --runtime nodejs20 \
-  --trigger-topic podcastNotificaction \
-  --region us-central1 \
+  --trigger-topic <TOPIC_NAME> \
+  --region europe-west1 \
   --entry-point getEpisodeLanguage
 ```
 
+
+gcloud functions deploy getEpisodeLanguage \
+  --gen2 \
+  --runtime nodejs20 \
+  --trigger-topic podcastNotificaction\
+  --region europe-west1 \
+  --entry-point getEpisodeLanguage
+
+In order to invoke the function from the topic, we need to grant it the necessary permissions.
+
 ```
 gcloud functions add-iam-policy-binding getEpisodeLanguage \
-    --region us-central1 \
-    --member="serviceAccount:702247964271-compute@developer.gserviceaccount.com" \
+    --region europe-west1 \
+    --member="serviceAccount:<YOUR_SERVICE_ACCOUNT>" \
     --role="roles/run.invoker"
 ```
 
+
 ## Cloud Run
 
-Una vez ya hemos visto toda la arquitetcura, en un proyecto real hacer todo este ejericio debería ayudarnos a la toma de decisiones. No que se quede en una proceso sin resolución. Por lo tanto vamos a crear un Dashboard en Streamlite.
-
-As fisrt step tienes que ejecutar este comando desde la consola para crear la imagen en Artfact regsitry, tienes que estar en la carpeta correspondiente:
+Once we’ve reviewed the full architecture, in a real project doing this exercise should help with decision-making. It shouldn’t remain as an unresolved process. Therefore, we will create a Dashboard using Streamlit.
 
 ```
-gcloud builds submit \                                               
-  --tag europe-west1-docker.pkg.dev/serverless-477916/spotifyartifact/playback-dashboard:latest .
+cd ./GCP/02_Code/02_CloudRun
 ```
 
-A continuación desde la consola despliega el servicio de cloud run para poder ver 
+Build the Docker image in Artifact Registry. Run this command from the console while in the corresponding folder:
 
 ```
-gcloud run deploy playback-dashboard \
-  --image europe-west1-docker.pkg.dev/serverless-477916/spotifyartifact/playback-dashboard:latest \
+gcloud builds submit \
+  --tag <REGION>-docker.pkg.dev/<PROJECT_ID>/<ARTIFACT_REPOSITORY>/<IMAGE_NAME>:latest .
+```
+
+After building the image, deploy it to Cloud Run:
+
+```
+gcloud run deploy <SERVICE_NAME> \
+  --image <REGION>-docker.pkg.dev/<PROJECT_ID>/<ARTIFACT_REPOSITORY>/<IMAGE_NAME>:latest \
   --platform managed \
-  --region europe-west1 \
+  --region <REGION> \
   --allow-unauthenticated
 ```
 
-Ciertas orgamizaciones no tienen permisos para hacer la url publicas debido a restricciones de la organización. Este comando permite acceder como si el servicio estuviera corriendo localmente sin cambiar permisos ni hacer el servicio público.  Permite probar servicios privados sin exponerlos públicamente.
-
+Certain organizations do not have permission to make URLs public due to organizational restrictions. This command allows you to access the service as if it were running locally without changing permissions or making the service public.  It allows you to test private services without exposing them publicly.
 
 ```
-gcloud run services proxy playback-dashboard --region=europe-west1
+gcloud run services proxy <SERVICE_NAME> --region=<REGION> 
 ```
 
-Abres tu navegador y vas:
+Open your browser and go to:
 
 http://127.0.0.1:8080/
 
@@ -375,9 +398,13 @@ http://127.0.0.1:8080/
 
 #### Transcribe Event-Driven
 
-Desde un punto de vista de un proyecto real hay veces que la información necesitamos que este en tiempo real, en cuento llega una nueva infromación necesitamos que se ejcute todo el flujo.
+From the perspective of a real project, there are times when we need information to be real-time. As soon as new data arrives, the entire workflow must be triggered automatically.
 
-Como primer paso vamos a crear una Funcion de segunda generación que nos va a permitir recibir el evento e insertarlo en Firestore.
+```
+cd ./GCP/02_Code/01_CloudFunction/Transcribe
+```
+
+As a first step, we are going to create a second-generation function that will allow us to receive the event and insert it into Firestore.
 
 ```
 gcloud functions deploy transcribe \
@@ -389,7 +416,7 @@ gcloud functions deploy transcribe \
     --memory 512MB \
     --entry-point transcribe
 ```
-
+In order to invoke the function from the bucket, we need to grant it the necessary permissions.
 
 ```
 gcloud functions add-iam-policy-binding transcribe \

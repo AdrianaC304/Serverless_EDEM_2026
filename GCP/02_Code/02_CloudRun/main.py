@@ -37,8 +37,9 @@ SELECT COUNT(DISTINCT user_id) AS total_users
 FROM `serverless-477916.serverless.playback`
 """
 
-# ToDo - Each episode associated with each user
-
+# ToDo - Graphic with each episode associated with each user in 
+# ToDo 
+# ToDo 
 
 # Ejecutar queries
 episodes_df = client.query(query_episodes).to_dataframe()

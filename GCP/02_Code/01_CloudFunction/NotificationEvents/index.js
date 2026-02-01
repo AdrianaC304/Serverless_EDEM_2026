@@ -1,11 +1,7 @@
 // index.js
 const { Firestore } = require('@google-cloud/firestore');
-const { PubSub } = require('@google-cloud/pubsub');
 
 const firestore = new Firestore();
-const pubsub = new PubSub();
-
-const OUTPUT_TOPIC = 'podcastLanguageResult';
 
 /**
  * Cloud Function 2nd Gen activada por Pub/Sub
@@ -24,7 +20,7 @@ exports.getEpisodeLanguage = async (message, context) => {
 
     console.log(`Buscando lenguaje para episode_id: ${episode_id}`);
 
-    //Firestore
+    // Firestore: Buscar el episodio en la colección 'transcripciones'
     const querySnapshot = await firestore
       .collection('transcripciones')
       .where('episode_id', '==', episode_id)
@@ -42,16 +38,15 @@ exports.getEpisodeLanguage = async (message, context) => {
 
     console.log(`Idioma del episodio ${episode_id}: ${language}`);
 
-    // Publish the language in another Pub/Sub topic.
-    const payload = {
+    // Guardar el resultado en la colección 'UserLanguage'
+    const userLanguageRef = firestore.collection('UserLanguage').doc(episode_id);
+    await userLanguageRef.set({
       episode_id,
-      language
-    };
+      language,
+      processed_at: Firestore.Timestamp.now()
+    });
 
-    const dataBuffer = Buffer.from(JSON.stringify(payload));
-    await pubsub.topic(OUTPUT_TOPIC).publish(dataBuffer);
-
-    console.log(`Idioma publicado en topic ${OUTPUT_TOPIC}`);
+    console.log(`Idioma guardado en la colección 'UserLanguage'`);
 
     return `Idioma procesado: ${language}`;
   } catch (error) {
