@@ -72,13 +72,18 @@ curl -H "Authorization: Bearer $TOKEN" \
 
 ### 📌 Description
 
-In this exercise, we will work entirely from the GCP interface. The goal is that when an image is uploaded to a bucket, a Cloud Function is triggered to copy the image from one bucket to another.
+In this exercise, we will work entirely from the GCP <span style="color:red">interface</span>. The goal is that when an image is uploaded to a bucket, a Cloud Function is triggered to copy the image from one bucket to another.
 
 ### Buckets
 
 You need to create two buckets for this exercise. The first can be named imagenes-originales and the second imagenes-miniaturas. Both buckets should be regional and located in europe-west1.
 
-### Trigger
+### Cloud Function
+
+Name: copyimage
+Region: europe-west1
+Type:  Node.js 22
+Trigger:
 
 - **Proveedor:** Cloud Storage  
 - **Tipo de evento:** `google.cloud.storage.object.v1.finalized`  
@@ -86,20 +91,14 @@ You need to create two buckets for this exercise. The first can be named imagene
 - **Destino:** Cloud Function HTTP (Gen 2)  
 - **Modo:** `GCS_NOTIFICATION`  
 
-```
-gcloud functions deploy copyImage \
-  --gen2 \
-  --runtime nodejs20 \
-  --region europe-west1\
-  --entry-point copyImage \
-  --trigger-event google.cloud.storage.object.v1.finalized \
-  --trigger-resource imagenes-originales \
-  --service-account <SERVICE_ACCOUNT>
-```
+
+Now you can copy the code `index.js` and put it in the interface, the entrypoint is copyImage. And also copy the code in `package.json`.
+
+This command is used to grant a specific account permission to invoke a Cloud Run service:
 
 ```
 gcloud run services add-iam-policy-binding copyimage \
-  --member="serviceAccount:<SERVICE_ACCOUNT>" \
+  --member="serviceAccount:702247964271-compute@developer.gserviceaccount.com" \
   --role="roles/run.invoker" \
   --region europe-west1
 ```
@@ -220,7 +219,7 @@ Additionally, you need to **modify the function deployment** to set up a **trigg
 
 ## Use case 1:
 
-<img src="00_DocAux/diagram1.png" width="1500"/>
+<img src="00_DocAux/Usecase1.png" width="1500"/>
 
 ## Use case 2:
 <img src="00_DocAux/diagram2.png" width="1500"/>
