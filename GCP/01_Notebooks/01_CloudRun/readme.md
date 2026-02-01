@@ -217,11 +217,11 @@ Additionally, you need to **modify the function deployment** to set up a **trigg
 
 # Using Cloud Run and Cloud Functions in Real-World Projects
 
-## Use case 1:
+***Use case 1:***
 
 <img src="Image/Usecase1.png" width="1500"/>
 
-## Use case 2:
+***Use case 2:***
 
 
 <img src="Image/Usecase2.png" width="1500"/>
