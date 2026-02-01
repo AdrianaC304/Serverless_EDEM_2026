@@ -309,34 +309,14 @@ gcloud dataflow flex-template run "<YOUR_DATAFLOW_JOB_NAME>" \
  --max-workers=1
 ```
 
-## CI/CD: Cloud Build
-
-- Go to the [Cloud Build console](https://console.cloud.google.com/cloud-build)
-- In the left panel, select *Repositories*.
-- In the *2nd Gen* tab, click on **Link Repository**.
-- In the *Connection* dropdown, click on **Create host connection** and link your GitHub account:
-    - Select only the repositories associated with your account that you want to link.
-    - Click install.
-    - Verify that the connection is created successfully.
-
-- In the left panel, select *Triggers*.
-    - Give it a name and select a specific region.
-    - The event will be **Push to a branch**.
-    - In *Repository*, connect to a new repository and s**elect the repository previously chosen in the connection**.
-    - Click on **Connect**.
-    - Select the **branch** this trigger will listen for changes on.
-    - As configuration, select **Cloud Build configuration file (yaml or json)**.
-    - For location, add the path to your proper [build.yml](./02_Code/03_CICD) file. Alternatively, you can select inline and copy and paste the content of the file.
-    - Select a service account with sufficient permissions to execute a Dataflow job (*If you do not specify a service account, it will use the default Compute Engine service account*)
-    - Click on **Create**.
-
-- Once the trigger is created, each new push to the specified branch will trigger the actions specified in the build file, following the steps we set.
-
 
 ## Cloud Functions
 
 #### Notification Events
 
+Anteriormente hemos dejado en un topic  
+
+Comprobamos que tenemos el topic creado y elegimos el correcto:
 
 ```
 gcloud pubsub topics list
@@ -393,7 +373,7 @@ http://127.0.0.1:8080/
 
 ## Cloud Functions
 
-#### Transcribe - Episode collection
+#### Transcribe Event-Driven
 
 Desde un punto de vista de un proyecto real hay veces que la información necesitamos que este en tiempo real, en cuento llega una nueva infromación necesitamos que se ejcute todo el flujo.
 
@@ -417,6 +397,30 @@ gcloud functions add-iam-policy-binding transcribe \
     --member="serviceAccount:702247964271-compute@developer.gserviceaccount.com" \
     --role="roles/run.invoker"
 ```
+
+
+## CI/CD: Cloud Build
+
+- Go to the [Cloud Build console](https://console.cloud.google.com/cloud-build)
+- In the left panel, select *Repositories*.
+- In the *2nd Gen* tab, click on **Link Repository**.
+- In the *Connection* dropdown, click on **Create host connection** and link your GitHub account:
+    - Select only the repositories associated with your account that you want to link.
+    - Click install.
+    - Verify that the connection is created successfully.
+
+- In the left panel, select *Triggers*.
+    - Give it a name and select a specific region.
+    - The event will be **Push to a branch**.
+    - In *Repository*, connect to a new repository and s**elect the repository previously chosen in the connection**.
+    - Click on **Connect**.
+    - Select the **branch** this trigger will listen for changes on.
+    - As configuration, select **Cloud Build configuration file (yaml or json)**.
+    - For location, add the path to your proper [build.yml](./02_Code/03_CICD) file. Alternatively, you can select inline and copy and paste the content of the file.
+    - Select a service account with sufficient permissions to execute a Dataflow job (*If you do not specify a service account, it will use the default Compute Engine service account*)
+    - Click on **Create**.
+
+- Once the trigger is created, each new push to the specified branch will trigger the actions specified in the build file, following the steps we set.
 
 
 
