@@ -1,95 +1,15 @@
-# ☁️ Ejercicios Extra: Cloud Functions & Cloud Run en GCP
+# ☁️ Extra Exercises: Cloud Functions & Cloud Run on GCP
 
 ![GCP](https://img.shields.io/badge/Platform-Google%20Cloud-blue?style=for-the-badge) 
 
-Este repositorio contiene **ejercicios prácticos de Cloud Functions y Cloud Run** en Google Cloud Platform.  
-El objetivo es aprender a manejar eventos de **Cloud Storage**, permisos de **IAM**, y desarrollar funciones **serverless** listas para producción.
+This repository contains hands-on exercises for Cloud Functions and Cloud Run on Google Cloud Platform. The goal is to learn how to handle Cloud Storage events, manage IAM permissions, and develop production-ready serverless functions.
 
 - Professors: 
     - [Javi Briones](https://github.com/jabrio)
     - [Adriana Campos](https://github.com/AdrianaC304)
 
 
----
-
-## Ejercicio 1: Generar botación aletoría o chistes aletorios
-
-### 📌 Descripción
-
-Vamos a usar una Cloud Function par generar chistes aletorios y votaciones aleatorias.
-
-```
-gcloud functions deploy generarchistes \
-  --gen2 \
-  --runtime nodejs20 \
-  --region us-central1 \
-  --entry-point randomJoke \
-  --trigger-http \
-  --allow-unauthenticated
-```
-
-```
-curl -H "Authorization: Bearer $(gcloud auth print-identity-token)" \
-  https://generarchistes-rtwwkofpoa-uc.a.run.app
-```
-
-
-
-## Ejercicio 2: Copiar imágenes entre buckets
-
-### 📌 Descripción
-
-En este ejercicio vamos a trabajar todo desde la propia intefaz de GCP. El objetivo de este ejercicio es que cuando se sube un archivo al bucket se lanza la función y se copia una imagen de un bucket a otro. 
-
----
-
-### Crear Cloud Functions 
-
-### Trigger
-
-- **Proveedor:** Cloud Storage  
-- **Tipo de evento:** `google.cloud.storage.object.v1.finalized`  
-- **Bucket origen:** `imagenes-originales`  
-- **Destino:** Cloud Function HTTP (Gen 2)  
-- **Modo:** `GCS_NOTIFICATION`  
-
-
-```
-curl -X POST \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $(gcloud auth print-identity-token)" \
-  -d '{
-        "name": "captura2.png",
-        "bucket": "imagenes-originales"
-      }' \
- https://copyimage-702247964271.europe-west1.run.app
-```
-
-
-## Ejercicio 3: Generar un mensaje 
-
-### 📌 Descripción
-
-Cloud Run expone HTTP público si --allow-unauthenticated, y Flask debe escuchar en 0.0.0.0 y puerto 8080. Funciona como servicio serverless escalable automáticamente
-
-
-## Ejercicio 4: Lectura y análisis de usuarios en BigQuery mediante Cloud Run
-
-### 📌 Descripción
-
-En este ejemplo vamos a leer de una Base de Datos (Bigquey) y vamos a ver que usuarios existen y que acciones realizan estos usuarios.
- 
- La API de Cloud RUN expone:
-
-- Expone qué usuarios existen
-- Expone qué episodios existen
-- Es la fuente de verdad para el generador
-
-
-Resumen de la Arquitectura:
-
-|Base de datos| >> |API| >> |Generador de eventos| >> |Pub/Sub|
-
+Before starting the exercises, make sure you have everything set up:
 
 ```
 gcloud config list
@@ -112,37 +32,27 @@ gcloud services enable artifactregistry.googleapis.com
 ```
 
 ```
-gcloud artifacts repositories create usuarios-repo \
+gcloud artifacts repositories create <REPOSITORY_NAME> \
   --repository-format=docker \
-  --location=us-central1
+  --location=<REGION>
 ```
 
-Es importante tener la cuenta de servicio  702247964271@cloudbuild.gserviceaccount.com para desplegar la imagen en GCP:
 
-roles/storage.objectAdmin
-roles/cloudbuild.builds.editor
-roles/artifactregistry.writer
-BigQuery Data Viewer
-BigQuery Job User
+## Exercise 1: Generate Random  Jokes
 
+### 📌 Description
 
-Creamos la imagen:
+We will use a Cloud Function to generate random jokes.
 
 ```
-gcloud builds submit \
-  --tag us-central1-docker.pkg.dev/serverless-477916/usuarios-repo/usuarios-api:latest .
-```
-
-Creamos la Cloud Run:
-
-```
-gcloud run deploy usuarios-api \
-  --image us-central1-docker.pkg.dev/serverless-477916/usuarios-repo/usuarios-api:latest \
-  --platform managed \
+gcloud functions deploy <FUNCTION_NAME> \
+  --gen2 \
+  --runtime nodejs20 \
+  --region <REGION> \
+  --entry-point randomJoke \
+  --trigger-http \
   --allow-unauthenticated
 ```
-
-Desde el temrinal podemos acceder a el identificador de todos los clientes: 
 
 ```
 gcloud auth print-identity-token
@@ -153,16 +63,164 @@ TOKEN=$(gcloud auth print-identity-token)
 ```
 
 ```
-curl -H "Authorization: Bearer $TOKEN" https://usuarios-api-rtwwkofpoa-ew.a.run.app/users
+curl -H "Authorization: Bearer $TOKEN" \
+  <YOUR_CLOUD_FUNCTION_URL>
+```
+
+
+## Exercise 2: Copy Images Between Buckets
+
+### 📌 Description
+
+In this exercise, we will work entirely from the GCP interface. The goal is that when an image is uploaded to a bucket, a Cloud Function is triggered to copy the image from one bucket to another.
+
+### Buckets
+
+You need to create two buckets for this exercise. The first can be named imagenes-originales and the second imagenes-miniaturas. Both buckets should be regional and located in europe-west1.
+
+### Trigger
+
+- **Proveedor:** Cloud Storage  
+- **Tipo de evento:** `google.cloud.storage.object.v1.finalized`  
+- **Bucket origen:** `imagenes-originales`  
+- **Destino:** Cloud Function HTTP (Gen 2)  
+- **Modo:** `GCS_NOTIFICATION`  
+
+```
+gcloud functions deploy copyImage \
+  --gen2 \
+  --runtime nodejs20 \
+  --region europe-west1\
+  --entry-point copyImage \
+  --trigger-event google.cloud.storage.object.v1.finalized \
+  --trigger-resource imagenes-originales \
+  --service-account <SERVICE_ACCOUNT>
+```
+
+```
+gcloud run services add-iam-policy-binding copyimage \
+  --member="serviceAccount:<SERVICE_ACCOUNT>" \
+  --role="roles/run.invoker" \
+  --region europe-west1
+```
+
+
+## Exercise 3: Generate a Message
+
+### 📌 Description
+
+Cloud Run exposes a public HTTP endpoint if `--allow-unauthenticated` is set. Flask must listen on `0.0.0.0` and port `8080`.   It runs as a **serverless service** that scales automatically.
+
+Build the Docker Image
+
+```
+gcloud builds submit --tag <REGION>-docker.pkg.dev/<PROJECT_ID>/<REPOSITORY>/<IMAGE_NAME>:latest .
+```
+
+Confirm the Image was Created
+
+```
+gcloud artifacts docker images list <REGION>-docker.pkg.dev/<PROJECT_ID>/<REPOSITORY>
+```
+
+Deploy the Cloud Run Service
+
+```
+gcloud run deploy <SERVICE_NAME> \
+  --image <REGION>-docker.pkg.dev/<PROJECT_ID>/<REPOSITORY>/<IMAGE_NAME>:latest \
+  --platform managed \
+  --region <REGION> \
+  --allow-unauthenticated
+```
+
+```
+TOKEN=$(gcloud auth print-identity-token)
+```
+
+```
+curl -H "Authorization: Bearer $TOKEN" \
+     https://<SERVICE_URL>/
+```
+
+```
+curl -H "Authorization: Bearer $TOKEN" \
+     https://<SERVICE_URL>/health
 ```
 
 
 
-# Uso de las Cloud Run y Cloud Functions en proyectos reales
+## Exercise 4: Reading and Analyzing Users in BigQuery via Cloud Run
 
-## Caso de uso 1:
+### 📌 Description
+
+In this example, we will read data from a **BigQuery database** to see which users exist and what actions they perform.  
+
+For this exercise, you have a file (`clientes.csv`) with random client information. Using the **GCP Console**, go to BigQuery, create a **new table**, and upload the `clientes.csv` file into it.
+
+The Cloud Run API provides:
+
+- A list of existing users  
+- A list of existing episodes  
+- The source of truth for the generator
+
+### Build the Docker Image
+
+```
+gcloud builds submit \
+  --tag <REGION>-docker.pkg.dev/<PROJECT_ID>/<REPOSITORY>/<IMAGE_NAME>:latest .
+```
+
+Deploy the Cloud Run Service:
+```
+gcloud run deploy <SERVICE_NAME> \
+  --image <REGION>-docker.pkg.dev/<PROJECT_ID>/<REPOSITORY>/<IMAGE_NAME>:latest \
+  --platform managed \
+  --allow-unauthenticated
+```
+
+## Requisitos de permisos para la cuenta de servicio
+
+La cuenta de servicio utilizada para el despliegue debe tener los siguientes permisos:
+
+- **Storage:** `roles/storage.objectAdmin`
+- **Cloud Build:** `roles/cloudbuild.builds.editor`
+- **Artifact Registry:** `roles/artifactregistry.writer`
+- **BigQuery:** 
+  - `BigQuery Data Viewer`
+  - `BigQuery Job User`
+
+Access All Client Identifiers from the Terminal
+
+Generate an identity token:
+```
+gcloud auth print-identity-token
+```
+
+```
+TOKEN=$(gcloud auth print-identity-token)
+```
+
+Call the Cloud Run API to get the list of users:
+```
+curl -H "Authorization: Bearer $TOKEN" https://<SERVICE_URL>/users
+```
+
+***Optional:***
+
+As an extra exercise within Exercise 4, you can implement the following architecture.  
+
+In this case, you need to **edit the `main.py` file** so that after reading from BigQuery, it inserts all user identifiers into a **Pub/Sub topic**.  
+
+Additionally, you need to **modify the function deployment** to set up a **trigger** so that the Cloud Run service executes **every time a new client is inserted**.  
+
+| Database (BigQuery) | >> | API (Cloud Run) | >> | Event Generator | >> | Pub/Sub |
+
+
+# Using Cloud Run and Cloud Functions in Real-World Projects
+
+## Use case 1:
 
 <img src="00_DocAux/diagram1.png" width="1500"/>
 
-## Caso de uso 2:
+## Use case 2:
 <img src="00_DocAux/diagram2.png" width="1500"/>
