@@ -1,6 +1,0 @@
-streamlit
-google-cloud-bigquery
-pandas
-plotly
-streamlit-option-menu
-db-dtypes
