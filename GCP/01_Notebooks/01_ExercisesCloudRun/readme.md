@@ -27,6 +27,8 @@ gcloud services enable cloudbuild.googleapis.com
 gcloud services enable run.googleapis.com containerregistry.googleapis.com
 ```
 
+Do not create a new repository if one already exists.
+
 ```
 gcloud services enable artifactregistry.googleapis.com
 ```
@@ -79,31 +81,26 @@ You can also allow traffic without authentication to view the joke. In the **sec
 
 In this exercise, we will work entirely from the GCP <span style="color:red">interface</span>. The goal is that when an image is uploaded to a bucket, a Cloud Function is triggered to copy the image from one bucket to another.
 
-### Buckets
+You need to create **two buckets** for this exercise. The first can be named imagenes-originales and the second imagenes-miniaturas. Both buckets should be regional and located in europe-west1.
 
-You need to create two buckets for this exercise. The first can be named imagenes-originales and the second imagenes-miniaturas. Both buckets should be regional and located in europe-west1.
+You need to create a **Cloud Function**. 
 
-### Cloud Function
-
-Name: copyimage
-Region: europe-west1
-Type:  Node.js 22
-Trigger:
-
-- **Proveedor:** Cloud Storage  
-- **Tipo de evento:** `google.cloud.storage.object.v1.finalized`  
-- **Bucket origen:** `imagenes-originales`  
-- **Destino:** Cloud Function HTTP (Gen 2)  
-- **Modo:** `GCS_NOTIFICATION`  
-
-
-Now you can copy the code `index.js` and put it in the interface, the entrypoint is copyImage. And also copy the code in `package.json`.
+- Name: copyimage
+- Region: europe-west1
+- Type:  Node.js 22
+- Trigger:
+  - **Type:** Cloud Storage  
+  - **Event type:** `google.cloud.storage.object.v1.finalized`  
+  - **Bucket :** `imagenes-originales`  
+- Code:
+  - Now you can copy the code `index.js` and put it in the interface, the entrypoint is copyImage. 
+  - Copy the code in `package.json`.
 
 This command is used to grant a specific account permission to invoke a Cloud Run service:
 
 ```
 gcloud run services add-iam-policy-binding copyimage \
-  --member="serviceAccount:702247964271-compute@developer.gserviceaccount.com" \
+  --member="<YOUR_SERVICE_ACCOUNT>" \
   --role="roles/run.invoker" \
   --region europe-west1
 ```
@@ -163,7 +160,7 @@ curl -H "Authorization: Bearer $TOKEN" \
 
 In this example, we will read data from a **BigQuery database** to see which users exist and what actions they perform.  
 
-For this exercise, you have a file (`clientes.csv`) with random client information. Using the **GCP Console**, go to BigQuery, create a **new table**, and upload the `clientes.csv` file into it.
+For this exercise, you have a file (`Clients.csv`) with random client information. Using the **GCP Console**, go to BigQuery, create a **new table**, and upload the `Clients.csv` file into it.
 
 The Cloud Run API provides:
 

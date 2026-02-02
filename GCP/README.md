@@ -309,6 +309,31 @@ gcloud dataflow flex-template run "<YOUR_DATAFLOW_JOB_NAME>" \
  --max-workers=1
 ```
 
+## CI/CD: Cloud Build
+
+- Go to the [Cloud Build console](https://console.cloud.google.com/cloud-build)
+- In the left panel, select *Repositories*.
+- In the *2nd Gen* tab, click on **Link Repository**.
+- In the *Connection* dropdown, click on **Create host connection** and link your GitHub account:
+    - Select only the repositories associated with your account that you want to link.
+    - Click install.
+    - Verify that the connection is created successfully.
+
+- In the left panel, select *Triggers*.
+    - Give it a name and select a specific region.
+    - The event will be **Push to a branch**.
+    - In *Repository*, connect to a new repository and s**elect the repository previously chosen in the connection**.
+    - Click on **Connect**.
+    - Select the **branch** this trigger will listen for changes on.
+    - As configuration, select **Cloud Build configuration file (yaml or json)**.
+    - For location, add the path to your proper [build.yml](./02_Code/03_CICD) file. Alternatively, you can select inline and copy and paste the content of the file.
+    - Select a service account with sufficient permissions to execute a Dataflow job (*If you do not specify a service account, it will use the default Compute Engine service account*)
+    - Click on **Create**.
+
+- Once the trigger is created, each new push to the specified branch will trigger the actions specified in the build file, following the steps we set.
+
+
+
 
 ## Cloud Functions
 
@@ -327,10 +352,32 @@ First, we check that the topic exists and make sure we are using the correct one
 gcloud pubsub topics list
 ```
 
-Next, we will deploy the function. This function allows us to take the episode identifier from the topic and return the default language for that user. In this case, the trigger name is the same as the topic name. Every time a message arrives, the function will output to the console the default language of that Spotify user and we are going to insert the language to Firestore.
+You have something like this:
+
+{
+  "notification_id": "e4f1c2d3-5a67-4b89-b123-9f0a1bc2d345",
+  "created_at": "2026-02-01T12:34:56.789Z",
+  "type": "CONTINUE_LISTENING",
+  "user_id": "user_6211",
+  "ttl_sec": 1800,
+  "payload": {
+    "episode_id": "episode_007",
+    "resume_position_sec": 125
+  }
+}
+
 
 ```
-gcloud functions deploy getEpisodeLanguage \
+python edem_notification_creation.py \
+    --firestore_collection <FIRESTORE_NAME> \
+    --project_id <PROJECT_ID>
+```
+
+Next, we will deploy the function. This function allows us to take the episode identifier from the topic and return the default language for that user. In this case, the trigger name is the same as the topic name. Every time a message arrives, the function will output to the console the default language of that Spotify user and we are going to insert the language to Firestore.
+
+
+```
+gcloud functions deploy notification \
   --gen2 \
   --runtime nodejs20 \
   --trigger-topic <TOPIC_NAME> \
@@ -338,10 +385,11 @@ gcloud functions deploy getEpisodeLanguage \
   --entry-point getEpisodeLanguage
 ```
 
+
 In order to invoke the function from the topic, we need to grant it the necessary permissions.
 
 ```
-gcloud functions add-iam-policy-binding getEpisodeLanguage \
+gcloud functions add-iam-policy-binding notification \
     --region europe-west1 \
     --member="serviceAccount:<YOUR_SERVICE_ACCOUNT>" \
     --role="roles/run.invoker"
@@ -399,8 +447,6 @@ VALUES
 - Add a navigation menu to simulate a real web application.
 - Add new visualizations/charts.
 
-<img src="00_DocAux/streamlite.png" width="1500"/>
-
 
 ## Cloud Functions
 
@@ -433,32 +479,6 @@ gcloud functions add-iam-policy-binding transcribe \
     --member="<YOUR_SERVICE_ACCOUNT>" \
     --role="roles/run.invoker"
 ```
-
-
-## CI/CD: Cloud Build
-
-- Go to the [Cloud Build console](https://console.cloud.google.com/cloud-build)
-- In the left panel, select *Repositories*.
-- In the *2nd Gen* tab, click on **Link Repository**.
-- In the *Connection* dropdown, click on **Create host connection** and link your GitHub account:
-    - Select only the repositories associated with your account that you want to link.
-    - Click install.
-    - Verify that the connection is created successfully.
-
-- In the left panel, select *Triggers*.
-    - Give it a name and select a specific region.
-    - The event will be **Push to a branch**.
-    - In *Repository*, connect to a new repository and s**elect the repository previously chosen in the connection**.
-    - Click on **Connect**.
-    - Select the **branch** this trigger will listen for changes on.
-    - As configuration, select **Cloud Build configuration file (yaml or json)**.
-    - For location, add the path to your proper [build.yml](./02_Code/03_CICD) file. Alternatively, you can select inline and copy and paste the content of the file.
-    - Select a service account with sufficient permissions to execute a Dataflow job (*If you do not specify a service account, it will use the default Compute Engine service account*)
-    - Click on **Create**.
-
-- Once the trigger is created, each new push to the specified branch will trigger the actions specified in the build file, following the steps we set.
-
-
 
 ## Clean Up
 

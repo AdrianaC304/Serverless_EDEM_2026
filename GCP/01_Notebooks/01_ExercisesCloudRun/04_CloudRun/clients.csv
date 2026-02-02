@@ -1,4 +1,4 @@
-Identificado_Usuario,Nombre,Apellido,Ubicación
+User_ID,First_Name,Last_Name,Location
 1,Juan,Pérez,Madrid
 2,Ana,Gómez,Barcelona
 3,Luis,Martínez,Valencia

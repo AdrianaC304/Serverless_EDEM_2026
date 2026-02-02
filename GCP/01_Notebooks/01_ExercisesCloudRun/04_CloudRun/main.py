@@ -13,7 +13,7 @@ class User(BaseModel):
 def get_users():
     query = """
         SELECT identificador
-        FROM `serverless-477916.serverless.clientes`
+        FROM `serverless-477916.serverless.clients`
         ORDER BY identificador
         LIMIT 1000
     """

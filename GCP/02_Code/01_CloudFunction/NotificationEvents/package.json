@@ -1,9 +1,0 @@
-{
-  "name": "get-episode-language-gen2",
-  "version": "1.0.0",
-  "main": "index.js",
-  "dependencies": {
-    "@google-cloud/firestore": "^6.4.0",
-    "@google-cloud/pubsub": "^3.1.0"
-  }
-}
