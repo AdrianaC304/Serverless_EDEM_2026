@@ -228,7 +228,7 @@ In this case, you need to **edit the `main.py` file** so that after reading from
 
 # Real-World Projects
 
-Cloud Functions and Cloud Run are widely used in real-world projects. Beyond the Snowflake example we have been working on, below we present two real use cases of these services.
+Cloud Functions and Cloud Run are widely used in real-world projects. Beyond the Spotify example we have been working on, below we present two real use cases of these services.
 
 ***Use case 1:***
 
