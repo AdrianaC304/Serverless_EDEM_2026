@@ -177,7 +177,7 @@ gcloud run deploy <SERVICE_NAME> \
   --allow-unauthenticated
 ```
 
-## Service Account Permission Requirements
+### Service Account Permission Requirements
 
 The service account used for deployment must have the following permissions:
 
@@ -208,14 +208,14 @@ curl -H "Authorization: Bearer $TOKEN" https://<SERVICE_URL>/users
 
 As an extra exercise within Exercise 4, you can implement the following architecture.  
 
-In this case, you need to **edit the `main.py` file** so that after reading from BigQuery, it inserts all user identifiers into a **Pub/Sub topic**.  
-
-Additionally, you need to **modify the function deployment** to set up a **trigger** so that the Cloud Run service executes **every time a new client is inserted**.  
-
 | Database (BigQuery) | >> | API (Cloud Run) | >> | Event Generator | >> | Pub/Sub |
+
+In this case, you need to **edit the `main.py` file** so that after reading from BigQuery, it inserts all user identifiers into a **Pub/Sub topic**. Additionally, you need to **modify the function deployment** to set up a **trigger** so that the Cloud Run service executes **every time a new client is inserted**.  
 
 
 # Using Cloud Run and Cloud Functions in Real-World Projects
+
+Cloud Functions and Cloud Run are widely used in real-world projects. Beyond the Snowflake example we have been working on, below we present two real use cases of these services.
 
 ***Use case 1:***
 
