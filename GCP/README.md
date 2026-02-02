@@ -419,17 +419,18 @@ gcloud functions deploy transcribe \
     --gen2 \
     --runtime python311 \
     --trigger-event google.cloud.storage.object.v1.finalized \
-    --trigger-resource edem-serverless-spotify\
+    --trigger-resource <BUCKET_NAME> \
     --region europe-west1 \
     --memory 512MB \
     --entry-point transcribe
 ```
+
 In order to invoke the function from the bucket, we need to grant it the necessary permissions.
 
 ```
 gcloud functions add-iam-policy-binding transcribe \
     --region europe-west1 \
-    --member="serviceAccount:702247964271-compute@developer.gserviceaccount.com" \
+    --member="<YOUR_SERVICE_ACCOUNT>" \
     --role="roles/run.invoker"
 ```
 
