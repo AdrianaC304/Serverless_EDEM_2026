@@ -340,13 +340,6 @@ gcloud functions deploy getEpisodeLanguage \
   --entry-point getEpisodeLanguage
 ```
 
-gcloud functions deploy getEpisodeLanguage \
-  --gen2 \
-  --runtime nodejs20 \
-  --trigger-topic podcastNotificaction \
-  --region europe-west1 \
-  --entry-point getEpisodeLanguage
-
 In order to invoke the function from the topic, we need to grant it the necessary permissions.
 
 ```
