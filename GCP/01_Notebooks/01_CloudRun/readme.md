@@ -44,6 +44,11 @@ gcloud artifacts repositories create <REPOSITORY_NAME> \
 
 We will use a Cloud Function to generate random jokes.
 
+
+```
+cd ./GCP/01_Notebooks/01_CloudRun/1_CloudFunctions
+```
+
 ```
 gcloud functions deploy <FUNCTION_NAME> \
   --gen2 \
@@ -110,6 +115,10 @@ gcloud run services add-iam-policy-binding copyimage \
 
 Cloud Run exposes a public HTTP endpoint if `--allow-unauthenticated` is set. Flask must listen on `0.0.0.0` and port `8080`.   It runs as a **serverless service** that scales automatically.
 
+```
+cd ./GCP/01_Notebooks/01_CloudRun/3_CloudRun
+```
+
 Build the Docker Image
 
 ```
@@ -161,6 +170,10 @@ The Cloud Run API provides:
 - A list of existing users  
 - A list of existing episodes  
 - The source of truth for the generator
+
+```
+cd ./GCP/01_Notebooks/01_CloudRun/4_CloudRun
+```
 
 ### Build the Docker Image
 
