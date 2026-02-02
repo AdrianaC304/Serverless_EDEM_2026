@@ -327,9 +327,7 @@ First, we check that the topic exists and make sure we are using the correct one
 gcloud pubsub topics list
 ```
 
-Next, we will deploy the function. This function allows us to take the episode identifier from the topic and return the default language for that user.
-
-In this case, the trigger name is the same as the topic name. Every time a message arrives, the function will output to the console the default language of that Spotify user. And we are going to insert to 
+Next, we will deploy the function. This function allows us to take the episode identifier from the topic and return the default language for that user. In this case, the trigger name is the same as the topic name. Every time a message arrives, the function will output to the console the default language of that Spotify user and we are going to insert the language to Firestore.
 
 ```
 gcloud functions deploy getEpisodeLanguage \
@@ -368,12 +366,13 @@ gcloud builds submit \
 After building the image, deploy it to Cloud Run:
 
 ```
-gcloud run deploy <SERVICE_NAME> \
+gcloud run deploy dashboard \
   --image <REGION>-docker.pkg.dev/<PROJECT_ID>/<ARTIFACT_REPOSITORY>/<IMAGE_NAME>:latest \
   --platform managed \
   --region <REGION> \
   --allow-unauthenticated
 ```
+
 
 Certain organizations do not have permission to make URLs public due to organizational restrictions. This command allows you to access the service as if it were running locally without changing permissions or making the service public.  It allows you to test private services without exposing them publicly.
 
@@ -384,6 +383,23 @@ gcloud run services proxy <SERVICE_NAME> --region=<REGION>
 Open your browser and go to:
 
 http://127.0.0.1:8080/
+
+Now go to BigQuery and insert this new record into the playback table. Then check if the dashboard has updated with the new data.
+
+```
+INSERT INTO `tu_proyecto.tu_dataset.tu_tabla` 
+(event_id, event_time, event_type, user_id, session_id, episode_id, show_id, position_sec, duration_sec, device_type, country)
+VALUES
+(12345, DATETIME("2026-02-02 15:30:00"), "play", 67890, 111, 222, 333, 12.5, 3600, "mobile", "US");
+```
+
+***Task***
+
+- Modify main.py and create a new version.
+- Add a navigation menu to simulate a real web application.
+- Add new visualizations/charts.
+
+<img src="00_DocAux/streamlite.png" width="1500"/>
 
 
 ## Cloud Functions

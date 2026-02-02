@@ -55,8 +55,7 @@ gcloud functions deploy <FUNCTION_NAME> \
   --runtime nodejs20 \
   --region <REGION> \
   --entry-point randomJoke \
-  --trigger-http \
-  --allow-unauthenticated
+  --trigger-http 
 ```
 
 ```
@@ -72,6 +71,7 @@ curl -H "Authorization: Bearer $TOKEN" \
   <YOUR_CLOUD_FUNCTION_URL>
 ```
 
+You can also allow traffic without authentication to view the joke. In the **security section**, change the option to Allow public access.
 
 ## Exercise 2: Copy Images Between Buckets
 
