@@ -421,7 +421,6 @@ gcloud run deploy dashboard \
   --allow-unauthenticated
 ```
 
-
 Certain organizations do not have permission to make URLs public due to organizational restrictions. This command allows you to access the service as if it were running locally without changing permissions or making the service public.  It allows you to test private services without exposing them publicly.
 
 ```
@@ -432,10 +431,10 @@ Open your browser and go to:
 
 http://127.0.0.1:8080/
 
-Now go to BigQuery and insert this new record into the playback table. Then check if the dashboard has updated with the new data.
+Now go to BigQuery and insert this new record into the **playback** table. Then check if the dashboard has updated with the new data.
 
-```
-INSERT INTO `tu_proyecto.tu_dataset.tu_tabla` 
+``` 
+INSERT INTO `<PROJECT_ID>.<DATASET_NAME>.<TABLE_NAME>`
 (event_id, event_time, event_type, user_id, session_id, episode_id, show_id, position_sec, duration_sec, device_type, country)
 VALUES
 (12345, DATETIME("2026-02-02 15:30:00"), "play", 67890, 111, 222, 333, 12.5, 3600, "mobile", "US");

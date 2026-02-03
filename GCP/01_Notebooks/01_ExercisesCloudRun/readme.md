@@ -96,6 +96,7 @@ You need to create a **Cloud Function**.
   - Now you can copy the code `index.js` and put it in the interface, the entrypoint is copyImage. 
   - Copy the code in `package.json`.
 
+
 This command is used to grant a specific account permission to invoke a Cloud Run service:
 
 ```
@@ -137,6 +138,8 @@ gcloud run deploy <SERVICE_NAME> \
   --region <REGION> \
   --allow-unauthenticated
 ```
+
+Now we are going to generate a token to test how to connect to it using authentication:
 
 ```
 TOKEN=$(gcloud auth print-identity-token)
@@ -198,9 +201,8 @@ The service account used for deployment must have the following permissions:
   - `BigQuery Data Viewer`
   - `BigQuery Job User`
 
-Access All Client Identifiers from the Terminal
+Access All Client Identifiers from the Terminal. Generate an identity token:
 
-Generate an identity token:
 ```
 gcloud auth print-identity-token
 ```
@@ -210,17 +212,16 @@ TOKEN=$(gcloud auth print-identity-token)
 ```
 
 Call the Cloud Run API to get the list of users:
+
 ```
 curl -H "Authorization: Bearer $TOKEN" https://<SERVICE_URL>/users
 ```
 
 ***Optional:***
 
-As an extra exercise within Exercise 4, you can implement the following architecture.  
+As an extra exercise within Exercise 4, you can implement the following architecture.   In this case, you need to **edit the `main.py` file** so that after reading from BigQuery, it inserts all user identifiers into a **Pub/Sub topic**. Additionally, you need to **modify the function deployment** to set up a **trigger** so that the Cloud Run service executes **every time a new client is inserted**.  
 
 | Database (BigQuery) | >> | API (Cloud Run) | >> | Event Generator | >> | Pub/Sub |
-
-In this case, you need to **edit the `main.py` file** so that after reading from BigQuery, it inserts all user identifiers into a **Pub/Sub topic**. Additionally, you need to **modify the function deployment** to set up a **trigger** so that the Cloud Run service executes **every time a new client is inserted**.  
 
 
 # Real-World Projects
