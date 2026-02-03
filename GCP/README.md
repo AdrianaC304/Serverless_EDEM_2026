@@ -354,6 +354,7 @@ gcloud pubsub topics list
 
 You have something like this:
 
+``` json
 {
   "notification_id": "e4f1c2d3-5a67-4b89-b123-9f0a1bc2d345",
   "created_at": "2026-02-01T12:34:56.789Z",
@@ -365,7 +366,7 @@ You have something like this:
     "resume_position_sec": 125
   }
 }
-
+```
 
 ```
 python edem_notification_creation.py \
