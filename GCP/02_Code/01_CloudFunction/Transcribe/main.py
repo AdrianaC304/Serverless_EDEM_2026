@@ -16,15 +16,17 @@ import numpy as np
 import struct
 import soundfile as sf
 from google.cloud import speech, storage, firestore
+import os
+
 
 # -----------------------------
-# Configuration
-BUCKET_NAME = "edem-serverless-spotify"
-FIRESTORE_COLLECTION = "episodes"
+# Configuración desde variables de entorno
+BUCKET_NAME = os.environ.get("BUCKET_NAME")
+FIRESTORE_COLLECTION = os.environ.get("FIRESTORE_COLLECTION")
 
 speech_client = speech.SpeechClient()
-storage_client = storage.Client()  
-firestore_client = firestore.Client()  
+storage_client = storage.Client()
+firestore_client = firestore.Client()
 
 # -----------------------------
 # Función para mapear texto a label

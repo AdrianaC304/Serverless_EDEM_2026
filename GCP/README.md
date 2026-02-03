@@ -464,10 +464,11 @@ gcloud functions deploy transcribe \
     --gen2 \
     --runtime python311 \
     --trigger-event google.cloud.storage.object.v1.finalized \
-    --trigger-resource <BUCKET_NAME> \
-    --region europe-west1 \
+    --trigger-resource <YOUR_BUCKET_NAME> \
+    --region <YOUR_REGION> \
     --memory 512MB \
-    --entry-point transcribe
+    --entry-point transcribe \
+    --set-env-vars BUCKET_NAME=<YOUR_BUCKET_NAME>,FIRESTORE_COLLECTION=<YOUR_FIRESTORE_COLLECTION>
 ```
 
 In order to invoke the function from the bucket, we need to grant it the necessary permissions.
