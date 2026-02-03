@@ -48,7 +48,7 @@ We will use a Cloud Function to generate random jokes.
 
 
 ```
-cd ./GCP/01_Notebooks/01_CloudRun/1_CloudFunctions
+cd ./GCP/01_Notebooks/01_ExercisesCloudRun/01_CloudFunctions
 ```
 
 ```
@@ -59,6 +59,8 @@ gcloud functions deploy <FUNCTION_NAME> \
   --entry-point randomJoke \
   --trigger-http 
 ```
+
+Now we are going to generate a token to test how to connect to it using authentication:
 
 ```
 gcloud auth print-identity-token
@@ -79,7 +81,7 @@ You can also allow traffic without authentication to view the joke. In the **sec
 
 ### 📌 Description
 
-In this exercise, we will work entirely from the GCP <span style="color:red">interface</span>. The goal is that when an image is uploaded to a bucket, a Cloud Function is triggered to copy the image from one bucket to another.
+In this exercise, we will work entirely from the GCP **interface**. The goal is that when an image is uploaded to a bucket, a Cloud Function is triggered to copy the image from one bucket to another.
 
 You need to create **two buckets** for this exercise. The first can be named imagenes-originales and the second imagenes-miniaturas. Both buckets should be regional and located in europe-west1.
 
@@ -114,7 +116,7 @@ gcloud run services add-iam-policy-binding copyimage \
 Cloud Run exposes a public HTTP endpoint if `--allow-unauthenticated` is set. Flask must listen on `0.0.0.0` and port `8080`.   It runs as a **serverless service** that scales automatically.
 
 ```
-cd ./GCP/01_Notebooks/01_CloudRun/3_CloudRun
+cd ./GCP/01_Notebooks/01_ExercisesCloudRun/03_CloudRun
 ```
 
 Build the Docker Image
@@ -172,10 +174,10 @@ The Cloud Run API provides:
 - The source of truth for the generator
 
 ```
-cd ./GCP/01_Notebooks/01_CloudRun/4_CloudRun
+cd ./GCP/01_Notebooks/01_ExercisesCloudRun/04_CloudRun
 ```
 
-### Build the Docker Image
+Build the Docker Image:
 
 ```
 gcloud builds submit \
@@ -183,6 +185,7 @@ gcloud builds submit \
 ```
 
 Deploy the Cloud Run Service:
+
 ```
 gcloud run deploy <SERVICE_NAME> \
   --image <REGION>-docker.pkg.dev/<PROJECT_ID>/<REPOSITORY>/<IMAGE_NAME>:latest \
@@ -190,7 +193,7 @@ gcloud run deploy <SERVICE_NAME> \
   --allow-unauthenticated
 ```
 
-### Service Account Permission Requirements
+**Service Account Permission Requirements**
 
 The service account used for deployment must have the following permissions:
 
@@ -200,6 +203,7 @@ The service account used for deployment must have the following permissions:
 - **BigQuery:** 
   - `BigQuery Data Viewer`
   - `BigQuery Job User`
+
 
 Access All Client Identifiers from the Terminal. Generate an identity token:
 
