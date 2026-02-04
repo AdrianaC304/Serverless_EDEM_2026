@@ -345,7 +345,7 @@ Previously, you published a message with user information to a Pub/Sub topic. No
 gcloud pubsub topics list
 ```
 
-You have something like this in this topic:
+You have a message like this in the topic:
 
 ``` json
 {
@@ -360,13 +360,14 @@ You have something like this in this topic:
   }
 }
 ```
-In addition, you have a collection in Firestore with Spotify **users** and their language as a reference.
+
+In addition, you have a Firestore collection with Spotify users and their preferred language.
 
 <img src="./02_Code/00_Dataflow/00_DocAux/.images/users.png" width="1500"/>
 
 
-We are going to create a new collection in firestore for CONTINUE_LISTENING:
-  
+We are going to create a new Firestore collection for CONTINUE_LISTENING notifications:
+
 ```
 cd ./GCP/02_Code/01_CloudFunction/NotificationEvents
 ```
@@ -377,14 +378,14 @@ python edem_notification_creation.py \
     --project_id <PROJECT_ID>
 ```
 
-Yo will se something like this:
+You will see something like this:
 
 <img src="./02_Code/00_Dataflow/00_DocAux/.images/notify.png" width="1500"/>
 
 
-## ToDO
+We will deploy the function. This function takes the user_id from the topic and returns a notification message in the user’s default language. 
 
-We will deploy the function. This function takes the user_id from the topic and returns a notification message in the user’s default language. In this case, the trigger name matches the topic name. Every time a message arrives, the function outputs a message to the console in the Spotify user's default language.
+In this case, the trigger name matches the topic name. Every time a message arrives, the function outputs a message to the console in the Spotify user's default language.
 
 
 1. Receives a Pub/Sub event triggered by a message published to a Pub/Sub topic.
@@ -414,14 +415,14 @@ We will deploy the function. This function takes the user_id from the topic and 
 ```
 gcloud functions deploy notification \
     --gen2 \
-    --region=us-central1 \
+    --region=europe-west1 \
     --runtime=python310 \
     --trigger-topic=YOUR_PUBSUB_TOPIC \
     --entry-point=notification \
     --project=YOUR_PROJECT_ID
 ```
 
-In order to invoke the function from the topic, we need to grant it the necessary permissions.
+To allow the Pub/Sub topic to invoke the function, we need to grant the required permissions.
 
 ```
 gcloud functions add-iam-policy-binding notification \
@@ -433,13 +434,16 @@ gcloud functions add-iam-policy-binding notification \
 
 ## Cloud Run
 
-Once we’ve reviewed the full architecture, in a real project doing this exercise should help with decision-making. It shouldn’t remain as an unresolved process. Therefore, we will create a Dashboard using Streamlit.
+Once we’ve reviewed the full architecture, this exercise should help with decision-making in a real project.
+
+It shouldn’t remain as an unresolved process. Therefore, we will create a dashboard using Streamlit.
 
 ```
 cd ./GCP/02_Code/02_CloudRun
 ```
 
-Build the Docker image in Artifact Registry. Run this command from the console while in the corresponding folder:
+
+Build and push the Docker image to Artifact Registry. Run the following command from the project directory: 
 
 ```
 gcloud builds submit \
@@ -457,7 +461,10 @@ gcloud run deploy dashboard \
 ```
 
 
-Certain organizations do not have permission to make URLs public due to organizational restrictions. This command allows you to access the service as if it were running **locally** without changing permissions or making the service public.  It allows you to test private services without exposing them publicly.
+Certain organizations do not have permission to make URLs public due to organizational restrictions. 
+
+This command allows you to access the service as if it were running locally, without changing permissions or making it public. It lets you test private services without exposing them publicly.
+
 
 ```
 gcloud run services proxy <SERVICE_NAME> --region=<REGION> 
@@ -467,10 +474,8 @@ Open your browser and go to:
 
 http://127.0.0.1:8080/
 
-Now go to BigQuery and insert this new record into your table. Then check if the dashboard has updated with the new data.
 
-
-***Task***
+***Tasks***
 
 - Modify main.py and create a new version.
 - Add a navigation menu to simulate a real web application.
@@ -479,15 +484,15 @@ Now go to BigQuery and insert this new record into your table. Then check if the
 
 ## Cloud Functions
 
-#### Transcribe Event-Driven
+#### Event-Driven Transcription
 
-From the perspective of a real project, there are times when we need information to be real-time. As soon as new data arrives, the entire workflow must be triggered automatically.
+From a real-world project perspective, there are cases where data needs to be processed in real time. As soon as new data arrives, the entire workflow must be triggered automatically.
 
 ```
 cd ./GCP/02_Code/01_CloudFunction/Transcribe
 ```
 
-As a first step, we are going to create a second-generation function that will allow us to receive the event and insert it into Firestore.
+As a first step, we create a second-generation Cloud Function that receives the event and writes the data to Firestore.
 
 ```
 gcloud functions deploy transcribe \
@@ -505,8 +510,8 @@ In order to invoke the function from the bucket, we need to grant it the necessa
 
 ```
 gcloud functions add-iam-policy-binding transcribe \
-    --region europe-west1 \
-    --member="<YOUR_SERVICE_ACCOUNT>" \
+    --region <YOUR_REGION> \
+    --member="serviceAccount:<YOUR_SERVICE_ACCOUNT>" \
     --role="roles/run.invoker"
 ```
 
