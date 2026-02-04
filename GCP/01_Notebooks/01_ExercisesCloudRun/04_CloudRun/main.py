@@ -12,9 +12,9 @@ class User(BaseModel):
 @app.get("/users", response_model=List[User])
 def get_users():
     query = """
-        SELECT identificador
-        FROM `serverless-477916.serverless.clients`
-        ORDER BY identificador
+        SELECT User_ID
+        FROM `<PROJECT_ID>.<DATASET>.<TABLE_NAME_CLIENTS>`
+        ORDER BY User_ID
         LIMIT 1000
     """
     query_job = client.query(query)
@@ -22,5 +22,5 @@ def get_users():
 
     users = []
     for row in results:
-        users.append(User(user_id=row.identificador))
+        users.append(User(user_id=row.User_ID))
     return users

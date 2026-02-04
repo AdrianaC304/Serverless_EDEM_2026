@@ -20,7 +20,7 @@ import os
 
 
 # -----------------------------
-# Configuración desde variables de entorno
+#Environment variables
 BUCKET_NAME = os.environ.get("BUCKET_NAME")
 FIRESTORE_COLLECTION = os.environ.get("FIRESTORE_COLLECTION")
 
@@ -29,7 +29,7 @@ storage_client = storage.Client()
 firestore_client = firestore.Client()
 
 # -----------------------------
-# Función para mapear texto a label
+# Function to map text to label
 def classify_text(text):
     """
     Classify transcription text into labels.
@@ -46,7 +46,7 @@ def classify_text(text):
         return "LABEL_0"  # world
 
 # -----------------------------
-# Función para mapear label técnico a legible
+# Function to map technical label to readable label
 def map_label(label):
     LABEL_MAP = {
         "LABEL_0": "world",
@@ -115,7 +115,7 @@ def transcribe(event, context):
     print("---------------------")
 
     # -----------------------------
-    # Clasificar la transcripción
+    # Classify
     label_key = classify_text(text)
     label = map_label(label_key)
     print(f"Assigned label: {label}")

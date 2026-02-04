@@ -66,6 +66,8 @@ Now we are going to generate a token to test how to connect to it using authenti
 gcloud auth print-identity-token
 ```
 
+- (Mac)
+
 ```
 TOKEN=$(gcloud auth print-identity-token)
 ```
@@ -73,6 +75,16 @@ TOKEN=$(gcloud auth print-identity-token)
 ```
 curl -H "Authorization: Bearer $TOKEN" \
   <YOUR_CLOUD_FUNCTION_URL>
+```
+
+- Windows
+  
+```
+$TOKEN = gcloud auth print-identity-token
+```
+
+```
+curl -H "Authorization: Bearer $TOKEN" <YOUR_CLOUD_FUNCTION_URL>
 ```
 
 You can also allow traffic without authentication to view the joke. In the **security section**, change the option to Allow public access.

@@ -339,20 +339,13 @@ gcloud dataflow flex-template run "<YOUR_DATAFLOW_JOB_NAME>" \
 
 #### Notification Events
 
-
-Previously, you published a message with user information to a Pub/Sub topic. Now, we are going to retrieve that message and display it.
-
-```
-cd ./GCP/02_Code/01_CloudFunction/NotificationEvents
-```
-
-First, we check that the topic exists and make sure we are using the correct one:
+Previously, you published a message with user information to a Pub/Sub topic. Now, we are going to retrieve that message and display it. First, we check that the topic exists and make sure we are using the correct one:
 
 ```
 gcloud pubsub topics list
 ```
 
-You have something like this:
+You have something like this in this topic:
 
 ``` json
 {
@@ -367,6 +360,13 @@ You have something like this:
   }
 }
 ```
+In addition, you have a collection in Firestore with Spotify users and their language as a reference.
+
+We are going to create a new collection in firestore for CONTINUE_LISTENING:
+  
+```
+cd ./GCP/02_Code/01_CloudFunction/NotificationEvents
+```
 
 ```
 python edem_notification_creation.py \
@@ -374,18 +374,49 @@ python edem_notification_creation.py \
     --project_id <PROJECT_ID>
 ```
 
-Next, we will deploy the function. This function allows us to take the episode identifier from the topic and return the default language for that user. In this case, the trigger name is the same as the topic name. Every time a message arrives, the function will output to the console the default language of that Spotify user and we are going to insert the language to Firestore.
+Yo will se something like this:
+
+<img src="./02_Code/00_Dataflow/00_DocAux/.images/notify.png" width="1500"/>
+
+
+## ToDO
+
+We will deploy the function. This function takes the user_id from the topic and returns a notification message in the user’s default language. In this case, the trigger name matches the topic name. Every time a message arrives, the function outputs a message to the console in the Spotify user's default language.
+
+
+1. Receives a Pub/Sub event triggered by a message published to a Pub/Sub topic.
+
+2. Reads the fields of the Pub/Sub message:
+   - `user_id`
+   - `type`
+   - `episode_id`
+
+3. Processes only messages of type `CONTINUE_LISTENING`.
+
+4. Retrieves the user’s preferred language from Firestore.
+
+5. Reads the **Notification** collection in Firestore to select the appropriate name.
+
+6. Selects the correct language template based on the user's preference.
+
+7. Replaces the template placeholders:
+   - `{{user_id}}`
+   - `{{episode_id}}`
+   with the actual values.
+
+8. Displays the message in the user’s preferred language.
+
 
 
 ```
 gcloud functions deploy notification \
-  --gen2 \
-  --runtime nodejs20 \
-  --trigger-topic <TOPIC_NAME> \
-  --region europe-west1 \
-  --entry-point getEpisodeLanguage
+    --gen2 \
+    --region=us-central1 \
+    --runtime=python310 \
+    --trigger-topic=YOUR_PUBSUB_TOPIC \
+    --entry-point=notification \
+    --project=YOUR_PROJECT_ID
 ```
-
 
 In order to invoke the function from the topic, we need to grant it the necessary permissions.
 
@@ -422,7 +453,8 @@ gcloud run deploy dashboard \
   --allow-unauthenticated
 ```
 
-Certain organizations do not have permission to make URLs public due to organizational restrictions. This command allows you to access the service as if it were running locally without changing permissions or making the service public.  It allows you to test private services without exposing them publicly.
+
+Certain organizations do not have permission to make URLs public due to organizational restrictions. This command allows you to access the service as if it were running **locally** without changing permissions or making the service public.  It allows you to test private services without exposing them publicly.
 
 ```
 gcloud run services proxy <SERVICE_NAME> --region=<REGION> 
@@ -432,14 +464,8 @@ Open your browser and go to:
 
 http://127.0.0.1:8080/
 
-Now go to BigQuery and insert this new record into the **playback** table. Then check if the dashboard has updated with the new data.
+Now go to BigQuery and insert this new record into your table. Then check if the dashboard has updated with the new data.
 
-``` 
-INSERT INTO `<PROJECT_ID>.<DATASET_NAME>.<TABLE_NAME>`
-(event_id, event_time, event_type, user_id, session_id, episode_id, show_id, position_sec, duration_sec, device_type, country)
-VALUES
-(12345, DATETIME("2026-02-02 15:30:00"), "play", 67890, 111, 222, 333, 12.5, 3600, "mobile", "US");
-```
 
 ***Task***
 
