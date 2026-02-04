@@ -360,7 +360,10 @@ You have something like this in this topic:
   }
 }
 ```
-In addition, you have a collection in Firestore with Spotify users and their language as a reference.
+In addition, you have a collection in Firestore with Spotify **users** and their language as a reference.
+
+<img src="./02_Code/00_Dataflow/00_DocAux/.images/users.png" width="1500"/>
+
 
 We are going to create a new collection in firestore for CONTINUE_LISTENING:
   
